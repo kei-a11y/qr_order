@@ -1,0 +1,30 @@
+{% extends 'qr/base.html' %}
+
+{% block title %}WiFi接続が必要です{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-wifi fa-4x text-warning mb-4"></i>
+                <h3 class="text-warning mb-3">WiFi接続が必要です</h3>
+                <p class="mb-4">
+                    ご注文をいただくには、まず店舗のWiFiに接続していただく必要があります。
+                </p>
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>接続手順</h5>
+                    <ol class="text-start mb-0">
+                        <li>テーブルに置かれた「WiFi接続用」QRコードをスキャンしてください</li>
+                        <li>WiFiに接続が完了したら、「注文用」QRコードをスキャンしてください</li>
+                        <li>メニューページにアクセスできるようになります</li>
+                    </ol>
+                </div>
+                <p class="text-muted small">
+                    WiFiに接続できない場合は、スタッフまでお声がけください。
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,67 @@
+{% extends 'qr/base.html' %}
+
+{% block title %}メニュー削除 - QR注文システム{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>メニュー削除確認</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-warning me-2"></i>注意</h6>
+                    <p class="mb-0">以下のメニューを削除しようとしています。この操作は取り消せません。</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h5>削除対象:</h5>
+                    <div class="border rounded p-3 bg-light">
+                        <div class="row">
+                            <div class="col-md-4">
+                                {% if menu_item.image %}
+                                <img src="{{ menu_item.image.url }}" class="img-fluid rounded" style="max-height: 120px; object-fit: cover;">
+                                {% else %}
+                                <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="height: 120px;">
+                                    <i class="fas fa-image text-white fa-2x"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-8">
+                                <h6><i class="fas fa-utensils me-2"></i>{{ menu_item.name }}</h6>
+                                <p class="text-muted mb-1">カテゴリ: {{ menu_item.category.name }}</p>
+                                <p class="text-muted mb-1">価格: ¥{{ menu_item.price|floatformat:0 }}</p>
+                                <p class="text-muted mb-1">表示順: {{ menu_item.order }}</p>
+                                {% if menu_item.description %}
+                                <p class="text-muted mb-1">説明: {{ menu_item.description|truncatechars:50 }}</p>
+                                {% endif %}
+                                <p class="text-muted mb-0">
+                                    {% if menu_item.is_available %}
+                                        ステータス: <span class="badge bg-success">提供中</span>
+                                    {% else %}
+                                        ステータス: <span class="badge bg-warning">品切れ</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'menu_management' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>キャンセル
+                    </a>
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>削除する
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

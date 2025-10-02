@@ -1,0 +1,66 @@
+{% extends 'qr/base.html' %}
+
+{% block title %}デバッグ情報{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-bug me-2"></i>デバッグ情報</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>アクセス情報</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>クライアントIP:</span>
+                                <code>{{ client_ip }}</code>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>ホスト:</span>
+                                <code>{{ host }}</code>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>User-Agent:</span>
+                                <small class="text-muted">{{ user_agent|truncatechars:50 }}</small>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>WiFi接続状況</h6>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>WiFi設定IP:</span>
+                                <code>{{ wifi_ip|default:"未設定" }}</code>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>接続チェック:</span>
+                                {% if wifi_connected %}
+                                    <span class="badge bg-success">OK</span>
+                                {% else %}
+                                    <span class="badge bg-danger">NG</span>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <h6>テスト用リンク</h6>
+                <div class="row">
+                    {% for table in tables %}
+                    <div class="col-md-3 mb-2">
+                        <a href="/order/{{ table.table_number }}/" class="btn btn-sm btn-outline-primary w-100">
+                            テーブル{{ table.table_number }}
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

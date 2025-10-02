@@ -1,0 +1,110 @@
+{% extends 'qr/base.html' %}
+
+{% block title %}メニュー管理 - QR注文システム{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2><i class="fas fa-book me-2"></i>メニュー管理</h2>
+                <p class="text-muted">メニューカテゴリと商品の管理を行います。</p>
+            </div>
+            <div>
+                <a href="{% url 'add_category' %}" class="btn btn-success me-2">
+                    <i class="fas fa-plus me-1"></i>カテゴリ追加
+                </a>
+                <a href="{% url 'add_menu_item' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>メニュー追加
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if categories %}
+    {% for category in categories %}
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+                <i class="fas fa-folder me-2"></i>{{ category.name }}
+                {% if not category.is_active %}
+                    <span class="badge bg-secondary ms-2">非表示</span>
+                {% endif %}
+                <span class="badge bg-light text-dark ms-2">表示順: {{ category.order }}</span>
+            </h5>
+            <div class="d-flex align-items-center">
+                <span class="badge bg-info me-2">{{ category.items.count }} 品目</span>
+                <div class="btn-group btn-group-sm">
+                    <a href="{% url 'edit_category' category.id %}" class="btn btn-outline-primary" title="カテゴリ編集">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'delete_category' category.id %}" class="btn btn-outline-danger" title="カテゴリ削除">
+                        <i class="fas fa-trash"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            {% if category.items.all %}
+            <div class="row">
+                {% for item in category.items.all %}
+                <div class="col-md-6 col-lg-4 mb-3">
+                    <div class="card h-100 {% if not item.is_available %}opacity-50{% endif %}">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" class="card-img-top" style="height: 200px; object-fit: contain; background-color:#f8f9fa;">
+
+                        {% endif %}
+                        <div class="card-body">
+                            <h6 class="card-title">
+                                {{ item.name }}
+                                {% if not item.is_available %}
+                                    <span class="badge bg-warning text-dark">品切れ</span>
+                                {% endif %}
+                            </h6>
+                            <p class="card-text small">{{ item.description|truncatechars:50 }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span class="h6 text-primary">¥{{ item.price|floatformat:0 }}</span>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'edit_menu_item' item.id %}" class="btn btn-outline-primary" title="編集">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'delete_menu_item' item.id %}" class="btn btn-outline-danger" title="削除">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-3">
+                <i class="fas fa-utensils fa-2x text-muted mb-2"></i>
+                <p class="text-muted">このカテゴリにはまだメニューがありません。</p>
+                <a href="{% url 'add_menu_item' %}" class="btn btn-sm btn-primary">
+                    <i class="fas fa-plus me-1"></i>メニュー追加
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-book fa-4x text-muted mb-4"></i>
+                <h4>メニューカテゴリがまだありません</h4>
+                <p class="text-muted mb-4">まずはメニューカテゴリを作成しましょう。</p>
+                <a href="{% url 'add_category' %}" class="btn btn-success">
+                    <i class="fas fa-plus me-1"></i>最初のカテゴリを追加
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

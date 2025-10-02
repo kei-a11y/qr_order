@@ -1,0 +1,242 @@
+{% extends 'qr/base.html' %}
+
+{% block title %}注文 - テーブル{{ table.table_number }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center col-md-5 mb-3">
+            <h2><i class="fas fa-utensils me-2"></i>メニュー</h2>
+            <div class="badge bg-primary fs-6">テーブル {{ table.table_number }}</div>
+        </div>
+
+
+    <div class=" col-md-5 mb-3">
+        <div class="order-summary">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i>注文内容</h5>
+                </div>
+                <div class="card-body">
+                    <div id="order-items" style=" margin-bottom: 0.1rem;">
+                        <div class="text-muted">商品を選択してください</div>
+                    </div>
+
+                    <hr class="my-1">
+
+                    <!--
+                    <div class="mb-1">
+                        <label for="order-notes" class="form-label">備考</label>
+                        <textarea id="order-notes" class="form-control" rows="3" placeholder="アレルギーや特別な要望があればご記入ください"></textarea>
+                    </div>
+                    -->
+                    <div class="d-flex justify-content-between align-items-center mb-1">
+                        <strong>合計金額:</strong>
+                        <strong class="text-primary" id="total-amount">¥0</strong>
+                    </div>
+                    
+                    <button id="submit-order" class="btn btn-success w-100" disabled>
+                        <i class="fas fa-paper-plane me-1"></i>注文を送信
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<br>
+
+        {% for category in categories %}
+        <div class="card col-md-5 mb-3">
+            <div class="card-header bg-light">
+                <h4 class="mb-0">{{ category.name }}</h4>
+            </div>
+            <div class="card-body ">
+                <div class="row">
+                    {% for item in category.items.all %}
+                    {% if item.is_available %}
+                    <div class=" mb-3">
+                        <div class="card menu-item-card h-100" data-item-id="{{ item.id }}">
+                            {% if item.image %}
+                            <img src="{{ item.image.url }}" class="card-img-top" style="height: 200px; object-fit: contain; background-color:#f8f9fa;">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ item.name }}</h5>
+                                <p class="card-text">{{ item.description }}</p>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="h5 text-primary">¥{{ item.price }}</span>
+                                    <div class="btn-group" role="group">
+                                        <button class="btn btn-outline-danger btn-sm quantity-btn" data-action="decrease">-</button>
+                                        <span class="btn btn-outline-secondary btn-sm quantity-display">0</span>
+                                        <button class="btn btn-outline-success btn-sm quantity-btn" data-action="increase">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+
+</div>
+
+<!-- 注文完了モーダル -->
+<div class="modal fade" id="orderSuccessModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-check-circle me-2"></i>注文完了
+                </h5>
+            </div>
+            <div class="modal-body text-center">
+                <p class="mb-0">ご注文ありがとうございます！</p>
+                <p>調理が完了するまでしばらくお待ちください。</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" id="close-window-btn">閉じる</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+$(document).ready(function() {
+    let orderItems = {};
+    let totalAmount = 0;
+
+    // 数量変更ボタンのイベント
+    $('.quantity-btn').click(function() {
+        const action = $(this).data('action');
+        const itemCard = $(this).closest('.menu-item-card');
+        const itemId = itemCard.data('item-id');
+        const itemName = itemCard.find('.card-title').text();
+        const itemPrice = parseInt(itemCard.find('.text-primary').text().replace('¥', '').replace(',', ''));
+        const quantityDisplay = itemCard.find('.quantity-display');
+        
+        let quantity = parseInt(quantityDisplay.text());
+        
+        if (action === 'increase') {
+            quantity++;
+        } else if (action === 'decrease' && quantity > 0) {
+            quantity--;
+        }
+        
+        quantityDisplay.text(quantity);
+        
+        if (quantity > 0) {
+            orderItems[itemId] = {
+                id: itemId,
+                name: itemName,
+                price: itemPrice,
+                quantity: quantity
+            };
+            itemCard.addClass('border-success');
+        } else {
+            delete orderItems[itemId];
+            itemCard.removeClass('border-success');
+        }
+        
+        updateOrderSummary();
+    });
+
+    function updateOrderSummary() {
+        const orderItemsContainer = $('#order-items');
+        const totalAmountElement = $('#total-amount');
+        const submitButton = $('#submit-order');
+        
+        orderItemsContainer.empty();
+        totalAmount = 0;
+        
+        if (Object.keys(orderItems).length === 0) {
+            orderItemsContainer.html('<p class="text-muted">商品を選択してください</p>');
+            submitButton.prop('disabled', true);
+        } else {
+            Object.values(orderItems).forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                totalAmount += itemTotal;
+                
+                orderItemsContainer.append(`
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div>
+                            <div class="fw-bold">${item.name}</div>
+                            <small class="text-muted">¥${item.price.toLocaleString()} × ${item.quantity}</small>
+                        </div>
+                        <div class="fw-bold">¥${itemTotal.toLocaleString()}</div>
+                    </div>
+                `);
+            });
+            submitButton.prop('disabled', false);
+        }
+        
+        totalAmountElement.text('¥' + totalAmount.toLocaleString());
+    }
+
+    // 注文送信
+    $('#submit-order').click(function() {
+        const notes = $('#order-notes').val();
+        const orderData = {
+            table_number: {{ table.table_number }},
+            items: Object.values(orderItems),
+            notes: notes
+        };
+
+        $.ajax({
+            url: '{% url "submit_order" %}',
+            type: 'POST',
+            data: JSON.stringify(orderData),
+            contentType: 'application/json',
+            beforeSend: function() {
+                $('#submit-order').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>送信中...');
+            },
+            success: function(response) {
+                if (response.status === 'success') {
+                    $('#orderSuccessModal').modal('show');
+                    // 注文をリセット
+                    orderItems = {};
+                    $('.quantity-display').text('0');
+                    $('.menu-item-card').removeClass('border-success');
+                    updateOrderSummary();
+                    $('#order-notes').val('');
+                } else {
+                    alert('注文の送信に失敗しました: ' + response.message);
+                }
+            },
+            error: function() {
+                alert('注文の送信に失敗しました。もう一度お試しください。');
+            },
+            complete: function() {
+                $('#submit-order').prop('disabled', false).html('<i class="fas fa-paper-plane me-1"></i>注文を送信');
+            }
+        });
+    });
+
+    // 閉じるボタンのイベント
+    $('#close-window-btn').click(function() {
+        // モーダルを閉じる
+        $('#orderSuccessModal').modal('hide');
+        
+        // ウィンドウ（タブ）を閉じる
+        window.close();
+        
+        // window.close()が効かない場合のフォールバック
+        // （一部のブラウザではスクリプトで開いたウィンドウしか閉じられない制限がある）
+        setTimeout(function() {
+            // 履歴を戻る、または空のページに遷移
+            if (window.history.length > 1) {
+                window.history.back();
+            } else {
+                window.location.href = 'about:blank';
+            }
+        }, 100);
+    });
+});
+</script>
+{% endblock %}

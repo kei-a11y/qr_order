@@ -1,0 +1,185 @@
+<div class="card-body">
+                <ul class="small mb-0">
+                    <li>パスワードを変更すると、次回ログイン時から新しいパスワードが必要になります。</li>
+                    <li>WiFi情報の登録（SSID、パスワード、セキュリティタイプ、IPアドレス）
+
+{% extends 'qr/base.html' %}
+
+{% block title %}システム設定 - QR注文システム{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h2><i class="fas fa-cog me-2"></i>システム設定</h2>
+        <p class="text-muted">パスワードやWiFi設定を変更できます。</p>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5><i class="fas fa-wrench me-2"></i>基本設定</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">
+                            <i class="fas fa-lock me-1"></i>{{ form.password.label }}
+                        </label>
+                        {{ form.password }}
+                        <div class="form-text">
+                            管理画面にログインするためのパスワードです。セキュリティのため定期的に変更することをお勧めします。
+                        </div>
+                        {% if form.password.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    <h6 class="text-primary"><i class="fas fa-wifi me-2"></i>WiFi設定</h6>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.wifi_ssid.id_for_label }}" class="form-label">
+                            {{ form.wifi_ssid.label }}
+                        </label>
+                        {{ form.wifi_ssid }}
+                        <div class="form-text">店舗のWiFiネットワーク名（SSID）です。</div>
+                        {% if form.wifi_ssid.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.wifi_ssid.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.wifi_password.id_for_label }}" class="form-label">
+                            {{ form.wifi_password.label }}
+                        </label>
+                        {{ form.wifi_password }}
+                        <div class="form-text">WiFiに接続するためのパスワードです。</div>
+                        {% if form.wifi_password.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.wifi_password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.wifi_security.id_for_label }}" class="form-label">
+                            {{ form.wifi_security.label }}
+                        </label>
+                        {{ form.wifi_security }}
+                        <div class="form-text">WiFiのセキュリティタイプです。</div>
+                        {% if form.wifi_security.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.wifi_security.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.server_ip.id_for_label }}" class="form-label">
+                            <i class="fas fa-server me-1"></i>{{ form.server_ip.label }}
+                        </label>
+                        {{ form.server_ip }}
+                        <div class="form-text">
+                            このサーバーのIPアドレスです。変更する場合は、既存のQRコードも再生成する必要があります。
+                        </div>
+                        {% if form.server_ip.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.server_ip.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="d-flex justify-content-between align-items-center">
+                        <a href="{% url 'admin_dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i>戻る
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>設定を保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-info-circle me-2"></i>現在の設定</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>WiFi SSID:</strong>
+                    <p class="text-muted mb-0">{{ store_settings.wifi_ssid }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>セキュリティタイプ:</strong>
+                    <p class="text-muted mb-0">{{ store_settings.get_wifi_security_display }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>サーバーIP:</strong>
+                    <p class="text-muted mb-0">{{ store_settings.server_ip }}</p>
+                </div>
+                <div class="mb-3">
+                    <strong>登録日時:</strong>
+                    <p class="text-muted mb-0">{{ store_settings.created_at|date:"Y年m月d日 H:i" }}</p>
+                </div>
+                <div class="mb-0">
+                    <strong>最終更新:</strong>
+                    <p class="text-muted mb-0">{{ store_settings.updated_at|date:"Y年m月d日 H:i" }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>注意事項</h6>
+            </div>
+            <div class="card-body">
+                <ul class="small mb-0">
+                    <li>パスワードを変更すると、次回ログイン時から新しいパスワードが必要になります。</li>
+                    <li>WiFi設定（SSID、パスワード、セキュリティタイプ）を変更した場合は、すべてのテーブルのQRコードを再生成して印刷し直す必要があります。</li>
+                    <li>サーバーIPアドレスを変更した場合も、全テーブルのQRコードの再生成が必要です。</li>
+                    <li>設定変更後は必ず動作確認を行ってください。</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-success text-white">
+                <h6 class="mb-0"><i class="fas fa-shield-alt me-2"></i>セキュリティヒント</h6>
+            </div>
+            <div class="card-body">
+                <ul class="small mb-0">
+                    <li>パスワードは8文字以上を推奨します</li>
+                    <li>英数字と記号を組み合わせると安全性が向上します</li>
+                    <li>他のサービスと同じパスワードは使用しないでください</li>
+                    <li>定期的にパスワードを変更しましょう</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

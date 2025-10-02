@@ -1,0 +1,139 @@
+{% extends 'qr/base.html' %}
+
+{% block title %}初期設定 - QR注文システム{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header text-center bg-success text-white">
+                <h4><i class="fas fa-cog me-2"></i>初期設定</h4>
+                <p class="mb-0">システムの初期設定を行ってください</p>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="{{ form.password.id_for_label }}" class="form-label">
+                            <i class="fas fa-lock me-1"></i>{{ form.password.label }}
+                        </label>
+                        {{ form.password }}
+                        <div class="form-text">管理画面にログインするためのパスワードを設定してください。</div>
+                        {% if form.password.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    <h6 class="text-primary"><i class="fas fa-wifi me-2"></i>WiFi設定</h6>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.wifi_ssid.id_for_label }}" class="form-label">
+                            {{ form.wifi_ssid.label }}
+                        </label>
+                        {{ form.wifi_ssid }}
+                        <div class="form-text">店舗のWiFiネットワーク名（SSID）を入力してください。</div>
+                        {% if form.wifi_ssid.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.wifi_ssid.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.wifi_password.id_for_label }}" class="form-label">
+                            {{ form.wifi_password.label }}
+                        </label>
+                        {{ form.wifi_password }}
+                        <div class="form-text">WiFiに接続するためのパスワードを入力してください。</div>
+                        {% if form.wifi_password.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.wifi_password.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.wifi_security.id_for_label }}" class="form-label">
+                            {{ form.wifi_security.label }}
+                        </label>
+                        {{ form.wifi_security }}
+                        <div class="form-text">WiFiのセキュリティタイプを選択してください。通常はWPA/WPA2です。</div>
+                        {% if form.wifi_security.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.wifi_security.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.server_ip.id_for_label }}" class="form-label">
+                            <i class="fas fa-server me-1"></i>{{ form.server_ip.label }}
+                        </label>
+                        {{ form.server_ip }}
+                        <div class="form-text">このサーバーのIPアドレスを入力してください（例：192.168.1.100）。顧客が注文ページにアクセスする際に使用されます。</div>
+                        {% if form.server_ip.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.server_ip.errors %}
+                                    {{ error }}
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-save me-1"></i>設定を保存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">
+                    <i class="fas fa-info-circle me-2"></i>設定について
+                </h5>
+                <ul class="mb-0">
+                    <li><strong>ログイン用パスワード</strong>: 管理画面へのログインに使用されます。</li>
+                    <li><strong>WiFi SSID</strong>: お客様が接続する店舗WiFiの名前です。</li>
+                    <li><strong>WiFiパスワード</strong>: WiFi接続用QRコードに含まれます。</li>
+                    <li><strong>セキュリティタイプ</strong>: ルーターの設定に合わせて選択してください。</li>
+                    <li><strong>サーバーIPアドレス</strong>: このサーバーのローカルIPアドレスを入力してください（例：192.168.1.100）。</li>
+                    <li class="text-danger"><strong>重要</strong>: 初期設定後、<code>http://localhost:8000</code>ではなく、入力したIPアドレスでアクセスするようになります。</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-3">
+            <div class="card-header bg-warning text-dark">
+                <h6 class="mb-0"><i class="fas fa-lightbulb me-2"></i>サーバーIPアドレスの確認方法</h6>
+            </div>
+            <div class="card-body">
+                <p class="small mb-2"><strong>Windows:</strong></p>
+                <code class="small">ipconfig</code>
+                <p class="small mb-2 mt-2"><strong>Mac/Linux:</strong></p>
+                <code class="small">ifconfig</code> または <code class="small">ip addr</code>
+                <p class="small mt-2 mb-0">
+                    コマンドプロンプト/ターミナルで上記コマンドを実行し、<br>
+                    「IPv4アドレス」または「inet」の値を確認してください。<br>
+                    通常は <code>192.168.x.x</code> の形式です。
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

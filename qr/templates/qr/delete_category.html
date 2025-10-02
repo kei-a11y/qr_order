@@ -1,0 +1,59 @@
+{% extends 'qr/base.html' %}
+
+{% block title %}カテゴリ削除 - QR注文システム{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5><i class="fas fa-exclamation-triangle me-2"></i>カテゴリ削除確認</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-warning">
+                    <h6><i class="fas fa-warning me-2"></i>注意</h6>
+                    <p class="mb-0">以下のカテゴリを削除しようとしています。この操作は取り消せません。</p>
+                </div>
+                
+                <div class="mb-3">
+                    <h5>削除対象:</h5>
+                    <div class="border rounded p-3 bg-light">
+                        <h6><i class="fas fa-folder me-2"></i>{{ category.name }}</h6>
+                        <p class="text-muted mb-1">表示順: {{ category.order }}</p>
+                        <p class="text-muted mb-0">
+                            {% if category.is_active %}
+                                ステータス: <span class="badge bg-success">有効</span>
+                            {% else %}
+                                ステータス: <span class="badge bg-secondary">無効</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+                
+                {% if menu_items_count > 0 %}
+                <div class="alert alert-danger">
+                    <h6><i class="fas fa-exclamation-circle me-2"></i>重要</h6>
+                    <p class="mb-0">
+                        このカテゴリには<strong>{{ menu_items_count }}個のメニュー項目</strong>が含まれています。
+                        カテゴリを削除すると、含まれるすべてのメニュー項目も削除されます。
+                    </p>
+                </div>
+                {% endif %}
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'menu_management' %}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left me-1"></i>キャンセル
+                    </a>
+                    
+                    <form method="post" class="d-inline">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i>削除する
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

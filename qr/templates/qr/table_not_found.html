@@ -1,0 +1,30 @@
+{% extends 'qr/base.html' %}
+
+{% block title %}テーブルが見つかりません{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-table fa-4x text-danger mb-4"></i>
+                <h3 class="text-danger mb-3">テーブルが見つかりません</h3>
+                <p class="mb-4">
+                    テーブル番号「{{ table_number }}」は存在しないか、現在利用できません。
+                </p>
+                <div class="alert alert-info">
+                    <h5><i class="fas fa-info-circle me-2"></i>考えられる原因</h5>
+                    <ul class="text-start mb-0">
+                        <li>QRコードが古い可能性があります</li>
+                        <li>テーブルが一時的に無効化されています</li>
+                        <li>システムメンテナンス中の可能性があります</li>
+                    </ul>
+                </div>
+                <p class="text-muted small">
+                    問題が解決しない場合は、スタッフまでお声がけください。
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
